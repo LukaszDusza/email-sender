@@ -25,17 +25,17 @@ public class EmailController {
         return "index";
     }
 
-    @PostMapping("/send-email-from-input")
+    @PostMapping("/send")
     public String sendEmailFromInput(@ModelAttribute MyEmail myEmail) {
 
         Context context = new Context();
         context.setVariable("body", myEmail.getBody());
-        String template = templateEngine.process("template", context); //'email' is a file in resource directory -> .html
+        String template = templateEngine.process("template", context); //'template' is a file in resource directory -> .html
         emailSender.sendEmail(myEmail.getAddress(), myEmail.getSubject() , template);
         return "index";
     }
 
-    @GetMapping("/send-email")
+    @GetMapping("/sender")
     public String sendEmail() {
         return "sender";
     }
