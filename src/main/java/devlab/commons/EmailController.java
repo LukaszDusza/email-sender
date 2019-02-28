@@ -1,8 +1,8 @@
 package devlab.commons;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -17,19 +17,26 @@ public class EmailController {
         this.templateEngine = templateEngine;
     }
 
+    @Value("${email.recipient}")
+    String emailRecipient;
+
     @GetMapping("/")
     public String home() {
         return "index";
     }
 
-    @GetMapping("/email-send")
-    public String send() {
+    @PostMapping("/send-email-from-input")
+    public String sendEmailFromInput(@ModelAttribute MyEmail myEmail) {
+
         Context context = new Context();
+        context.setVariable("body", myEmail.getBody());
+        String template = templateEngine.process("template", context); //'email' is a file in resource directory -> .html
+        emailSender.sendEmail(myEmail.getAddress(), myEmail.getSubject() , template);
+        return "index";
+    }
 
-        context.setVariable("greeting", "ten email został wysłany z mojej apikacji w Spring Boot :)");
-
-        String body = templateEngine.process("email", context);
-        emailSender.sendEmail("lukaszdusza280@gmail.com", "przykladowy mail", body);
-        return "redirect:/";
+    @GetMapping("/send-email")
+    public String sendEmail() {
+        return "sender";
     }
 }
